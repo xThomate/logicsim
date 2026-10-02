@@ -221,6 +221,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jButton_reset.setFont(ModernUI.MEDIUM);
         ModernUI.styleToolbarButton(jButton_reset, false);
         configureZoomControls();
+        jButton_zoom_reset.setVisible(true);
         jButton_reset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 jButton_reset_actionPerformed(e);
@@ -252,7 +253,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
             }
         });
         jSplitPane.setOneTouchExpandable(false);
-        jSplitPane.setDividerLocation(292);
+        jSplitPane.setDividerLocation(282);
         jSplitPane.setPreferredSize(new Dimension(1360, 680));
         jSplitPane.setResizeWeight(1.0);
         jSplitPane.setBorder(null);
@@ -262,7 +263,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jPanel_gates.setLayout(borderLayout2);
         jPanel_gates.setBackground(ModernUI.SIDEBAR);
         jPanel_gates.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(0x1E293B)));
-        jPanel_gates.setPreferredSize(new Dimension(292, 200));
+        jPanel_gates.setPreferredSize(new Dimension(282, 200));
         jPanel_gates.setMinimumSize(new Dimension(268, 200));
         jPanel_gates.setMaximumSize(new Dimension(360, Integer.MAX_VALUE));
         jList_gates.addMouseListener(new LSFrame_jList_gates_mouseAdapter(this));
@@ -341,7 +342,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jPanel_inputs.add(jComboBox_numinput, BorderLayout.CENTER);
         jPanel_gates.add(jPanel_inputs, BorderLayout.SOUTH);
         styleSidebarCombo(jComboBox_numinput);
-        jComboBox_numinput.setPreferredSize(new Dimension(238, 44));
+        jComboBox_numinput.setPreferredSize(new Dimension(218, 44));
 
         jSplitPane.add(jPanel_gates, JSplitPane.LEFT);
         jSplitPane.add(jScrollPane_lspanel, JSplitPane.RIGHT);
@@ -358,11 +359,12 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jToolBar.add(jToggleButton_simulate, null);
         jToolBar.add(jButton_reset, null);
         jToolBar.add(Box.createHorizontalStrut(18));
-        jToolBar.add(jButton_zoom_out);
         zoomLabel.setFont(ModernUI.MEDIUM);
+        zoomLabel.setToolTipText("Current zoom level");
         zoomLabel.setForeground(ModernUI.MUTED);
         zoomLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        zoomLabel.setPreferredSize(new Dimension(48, 42));
+        zoomLabel.setPreferredSize(new Dimension(52, 42));
+        jToolBar.add(jButton_zoom_out);
         jToolBar.add(zoomLabel);
         jToolBar.add(jButton_zoom_in);
         jToolBar.add(jButton_zoom_reset);
@@ -491,7 +493,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jButton_zoom_in.setCursor(new Cursor(Cursor.HAND_CURSOR));
         ModernUI.styleZoomButton(jButton_zoom_in);
 
-        jButton_zoom_reset.setText("100%");
+        jButton_zoom_reset.setText("Reset");
         jButton_zoom_reset.setFont(ModernUI.SMALL);
         jButton_zoom_reset.setToolTipText("Reset zoom to 100%");
         jButton_zoom_reset.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -598,7 +600,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
                 if (e.getSource()==lspanel) {
                     for (int i=0; i<lspanel.gates.size(); i++) {
                         Gate g=lspanel.gates.get(i);
-                        if (g.inside(e.getX(), e.getY())) {
+                        if (g.inside(lspanel.toCanvasX(e.getX()), lspanel.toCanvasY(e.getY()))) {
                             popupGateIdx=i;
                             menuItem_properties.setEnabled(g.hasProperties());
                             popup.show(e.getComponent(), e.getX(), e.getY());

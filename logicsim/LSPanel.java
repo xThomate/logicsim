@@ -241,9 +241,17 @@ public class LSPanel extends JPanel implements Printable {
   }
 
 
+  public int toCanvasX(int viewX) {
+    return (int)Math.round(viewX / zoom);
+  }
+
+  public int toCanvasY(int viewY) {
+    return (int)Math.round(viewY / zoom);
+  }
+
   private Point toCanvasPoint(MouseEvent e) {
     Point p = e.getPoint();
-    return new Point((int)Math.round(p.x / zoom), (int)Math.round(p.y / zoom));
+    return new Point(toCanvasX(p.x), toCanvasY(p.y));
   }
 
   protected void processMouseMotionEvent(MouseEvent e) {

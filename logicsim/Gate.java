@@ -182,7 +182,7 @@ public abstract class Gate implements Serializable {
         int cy=getInputPosition(i);
         drawConnectorPort(g, x, y+cy, true, inputTypes[i]==INTYPE_NEGATIVE);
         if (inputTypes[i]==INTYPE_NEGATIVE)
-          g.drawLine(x-2, y+cy, x+3, y+cy);
+          g.drawLine(x+3, y+cy, x+5, y+cy);
         else if (inputTypes[i]==INTYPE_HIGH) {
           g.setFont(ModernUI.SMALL.deriveFont(java.awt.Font.BOLD, 13f));
           g.drawString("1", x-5, y+cy+5);
@@ -242,18 +242,17 @@ public abstract class Gate implements Serializable {
                                   boolean inverted) {
     if (input && inverted) {
       g.setColor(ModernUI.SURFACE);
-      g.fillOval(px - 8, py - 8, 16, 16);
+      g.fillOval(px - 9, py - 9, 18, 18);
       g.setColor(ModernUI.CONNECTOR);
-      g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-      g.drawOval(px - 7, py - 7, 14, 14);
+      g.setStroke(new BasicStroke(2.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+      g.drawOval(px - 8, py - 8, 16, 16);
       return;
     }
     g.setColor(ModernUI.CONNECTOR_FILL);
-    g.fillOval(px - 6, py - 6, 12, 12);
+    g.fillOval(px - 7, py - 7, 14, 14);
     g.setColor(ModernUI.CONNECTOR);
-    g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-    g.drawOval(px - 5, py - 5, 10, 10);
-    g.setColor(ModernUI.CONNECTOR);
+    g.setStroke(new BasicStroke(2.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    g.drawOval(px - 6, py - 6, 12, 12);
     g.fillOval(px - 2, py - 2, 4, 4);
   }
 
