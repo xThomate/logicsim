@@ -74,6 +74,10 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
     JToolBar jToolBar = new JToolBar();
     JToggleButton jToggleButton_simulate = new JToggleButton();
     JButton jButton_reset = new JButton();
+    JButton jButton_zoom_out = new JButton();
+    JButton jButton_zoom_in = new JButton();
+    JButton jButton_zoom_reset = new JButton();
+    JLabel zoomLabel = new JLabel("100%");
     JMenu jMenuModule = new JMenu();
     JMenuItem jMenuItem_createmod = new JMenuItem();
     JMenuItem jMenuItem_modproperties = new JMenuItem();
@@ -216,6 +220,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jButton_reset.setIcon(ModernIcons.createThemed("reset", 19));
         jButton_reset.setFont(ModernUI.MEDIUM);
         ModernUI.styleToolbarButton(jButton_reset, false);
+        configureZoomControls();
         jButton_reset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 jButton_reset_actionPerformed(e);
@@ -247,7 +252,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
             }
         });
         jSplitPane.setOneTouchExpandable(false);
-        jSplitPane.setDividerLocation(270);
+        jSplitPane.setDividerLocation(292);
         jSplitPane.setPreferredSize(new Dimension(1360, 680));
         jSplitPane.setResizeWeight(1.0);
         jSplitPane.setBorder(null);
@@ -257,9 +262,9 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jPanel_gates.setLayout(borderLayout2);
         jPanel_gates.setBackground(ModernUI.SIDEBAR);
         jPanel_gates.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(0x1E293B)));
-        jPanel_gates.setPreferredSize(new Dimension(270, 200));
-        jPanel_gates.setMinimumSize(new Dimension(250, 200));
-        jPanel_gates.setMaximumSize(new Dimension(310, Integer.MAX_VALUE));
+        jPanel_gates.setPreferredSize(new Dimension(292, 200));
+        jPanel_gates.setMinimumSize(new Dimension(268, 200));
+        jPanel_gates.setMaximumSize(new Dimension(360, Integer.MAX_VALUE));
         jList_gates.addMouseListener(new LSFrame_jList_gates_mouseAdapter(this));
         jList_gates.setFont(ModernUI.NORMAL);
         jList_gates.setBackground(ModernUI.SIDEBAR);
@@ -329,12 +334,14 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jLabel_inputs.setForeground(new Color(0x8994AA));
         jLabel_inputs.setText("GATE INPUTS");
         jLabel_inputs.setFont(ModernUI.SMALL.deriveFont(java.awt.Font.BOLD, 10f));
+        jLabel_inputs.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         jPanel_inputs.setBackground(ModernUI.SIDEBAR);
         jPanel_inputs.setBorder(BorderFactory.createEmptyBorder(14, 16, 0, 16));
         jPanel_inputs.add(jLabel_inputs, BorderLayout.NORTH);
         jPanel_inputs.add(jComboBox_numinput, BorderLayout.CENTER);
         jPanel_gates.add(jPanel_inputs, BorderLayout.SOUTH);
         styleSidebarCombo(jComboBox_numinput);
+        jComboBox_numinput.setPreferredSize(new Dimension(238, 44));
 
         jSplitPane.add(jPanel_gates, JSplitPane.LEFT);
         jSplitPane.add(jScrollPane_lspanel, JSplitPane.RIGHT);
@@ -350,9 +357,20 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jToolBar.add(component2, null);
         jToolBar.add(jToggleButton_simulate, null);
         jToolBar.add(jButton_reset, null);
+        jToolBar.add(Box.createHorizontalStrut(18));
+        jToolBar.add(jButton_zoom_out);
+        zoomLabel.setFont(ModernUI.MEDIUM);
+        zoomLabel.setForeground(ModernUI.MUTED);
+        zoomLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        zoomLabel.setPreferredSize(new Dimension(48, 42));
+        jToolBar.add(zoomLabel);
+        jToolBar.add(jButton_zoom_in);
+        jToolBar.add(jButton_zoom_reset);
         jToolBar.setFloatable(false);
         jToolBar.setRollover(true);
-        jToolBar.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
+        jToolBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 1, 0, 0, ModernUI.BORDER),
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         jToolBar.setBackground(ModernUI.SURFACE);
         jToolBar.setPreferredSize(new Dimension(10, 66));
         jPanel1.setPreferredSize(new Dimension(10, 67));
@@ -363,6 +381,7 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         jMenuModule.add(jMenuItem_modproperties);
         
         ModernUI.styleMenuBar(jMenuBar1);
+        ModernUI.styleToolbarDivider(jToolBar);
         ModernUI.styleMenuItems(jMenuFileExit, jMenuHelpAbout, jMenuItem_help,
                 jMenuItem_createmod, jMenuItem_modproperties, jMenuItem_exportimage,
                 jMenuItem_print, jMenuItem_new, jMenuItem_open, jMenuItem_save,
@@ -459,6 +478,56 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         this.getContentPane().setBackground(ModernUI.BACKGROUND);
         this.requestFocus();
     }
+    private void configureZoomControls() {
+        jButton_zoom_out.setText("−");
+        jButton_zoom_out.setFont(ModernUI.TITLE);
+        jButton_zoom_out.setToolTipText("Zoom out");
+        jButton_zoom_out.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        ModernUI.styleZoomButton(jButton_zoom_out);
+
+        jButton_zoom_in.setText("+");
+        jButton_zoom_in.setFont(ModernUI.TITLE);
+        jButton_zoom_in.setToolTipText("Zoom in");
+        jButton_zoom_in.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        ModernUI.styleZoomButton(jButton_zoom_in);
+
+        jButton_zoom_reset.setText("100%");
+        jButton_zoom_reset.setFont(ModernUI.SMALL);
+        jButton_zoom_reset.setToolTipText("Reset zoom to 100%");
+        jButton_zoom_reset.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        ModernUI.styleZoomButton(jButton_zoom_reset);
+        jButton_zoom_reset.setPreferredSize(new Dimension(64, 42));
+
+        jButton_zoom_out.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                lspanel.zoomOut();
+                updateZoomLabel();
+            }
+        });
+        jButton_zoom_in.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                lspanel.zoomIn();
+                updateZoomLabel();
+            }
+        });
+        jButton_zoom_reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                lspanel.resetZoom();
+                updateZoomLabel();
+            }
+        });
+        lspanel.addPropertyChangeListener("zoom", new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent e) {
+                updateZoomLabel();
+            }
+        });
+        updateZoomLabel();
+    }
+
+    private void updateZoomLabel() {
+        zoomLabel.setText(Math.round(lspanel.getZoom() * 100) + "%");
+    }
+
     private void styleSidebarCombo(JComboBox combo) {
         combo.setFont(ModernUI.NORMAL);
         combo.setForeground(new Color(0xE8ECF5));
@@ -619,11 +688,10 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
         
         if (showDiscardDialog(I18N.getString("MENU_OPEN"))==false) return;
         
-        JFileChooser chooser = new JFileChooser(fileName);
-        //chooser.setLocale(currentLocale);
-        if (chooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION) {
-            fileName = chooser.getSelectedFile().getAbsolutePath();
-        } else return;  // FileChooser Cancel
+        File selected = NativeFileChooser.choose(this, window, fileName,
+                I18N.getString("MENU_OPEN"), false, null, null);
+        if (selected == null) return;  // native chooser cancelled
+        fileName = selected.getAbsolutePath();
         
         // **DM 26.12.2008 ** //
         // Simulation anhalten und einen Reset ausfuehren
@@ -689,13 +757,11 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
     }
     
     public boolean showSaveDialog() {
-        JFileChooser chooser = new JFileChooser(fileName);
-        chooser.setDialogTitle(I18N.getString("MESSAGE_SAVEDIALOG"));
-        //chooser.setLocale(currentLocale);
-        if (chooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION) {
-            fileName = chooser.getSelectedFile().getAbsolutePath();
-            return true;
-        } else return false;  // FileChooser Cancel
+        File selected = NativeFileChooser.choose(this, window, fileName,
+                I18N.getString("MESSAGE_SAVEDIALOG"), true, null, null);
+        if (selected == null) return false;  // native chooser cancelled
+        fileName = selected.getAbsolutePath();
+        return true;
     }
     
     void jMenuItem_saveas_actionPerformed(ActionEvent e) {
@@ -812,18 +878,10 @@ public class LSFrame extends JInternalFrame implements java.awt.event.ActionList
     
     void exportImage() {
       String filename="logicsim.png";
-      JFileChooser chooser = new JFileChooser();
-      ExampleFileFilter filter = new ExampleFileFilter();
-      filter.addExtension("png");
-      filter.setDescription("PNG");
-      chooser.setFileFilter(filter);
-
-      chooser.setDialogTitle(I18N.getString("MESSAGE_SAVEDIALOG"));
-      if (chooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION) {
-        filename = chooser.getSelectedFile().getAbsolutePath();
-      } else {
-        return;  // FileChooser Cancel
-      }
+      File selected = NativeFileChooser.choose(this, window, filename,
+              I18N.getString("MESSAGE_SAVEDIALOG"), true, "png", "PNG");
+      if (selected == null) return;  // native chooser cancelled
+      filename = selected.getAbsolutePath();
       
       BufferedImage image = (BufferedImage)this.createImage(this.lspanel.getWidth(), this.lspanel.getHeight());
       Graphics g = image.getGraphics();

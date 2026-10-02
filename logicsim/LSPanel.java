@@ -27,6 +27,9 @@ public class LSPanel extends JPanel implements Printable {
   public boolean changed=false;  // true, wenn etwas geaendert wurde, damit beim Oeffnen eine Sicherheitsabfrage angezeigt wird
 
   private Dimension panelSize = new Dimension(1600, 1200);
+  private double zoom = 1.0;
+  private static final double MIN_ZOOM = 0.5;
+  private static final double MAX_ZOOM = 2.5;
 
   static final int ACTION_AND = 1;
   static final int ACTION_NAND = 2;
@@ -74,6 +77,26 @@ public class LSPanel extends JPanel implements Printable {
       public void keyPressed(KeyEvent e) {
         myKeyPressed(e);
       }
+    });
+    this.getInputMap(WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK), "zoomIn");
+    this.getInputMap(WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK), "zoomIn");
+    this.getInputMap(WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK), "zoomOut");
+    this.getInputMap(WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_0,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK), "zoomReset");
+    this.getActionMap().put("zoomIn", new AbstractAction() {
+      private static final long serialVersionUID = 1L;
+      public void actionPerformed(ActionEvent e) { zoomIn(); repaint(); }
+    });
+    this.getActionMap().put("zoomOut", new AbstractAction() {
+      private static final long serialVersionUID = 1L;
+      public void actionPerformed(ActionEvent e) { zoomOut(); repaint(); }
+    });
+    this.getActionMap().put("zoomReset", new AbstractAction() {
+      private static final long serialVersionUID = 1L;
+      public void actionPerformed(ActionEvent e) { resetZoom(); repaint(); }
     });
   }
 
@@ -137,6 +160,36 @@ public class LSPanel extends JPanel implements Printable {
     paintGrid=onoff;
   }
 
+  public double getZoom() {
+    return zoom;
+  }
+
+  public void setZoom(double value) {
+    double oldZoom = zoom;
+    zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value));
+    if (Double.compare(oldZoom, zoom) != 0) {
+      firePropertyChange("zoom", oldZoom, zoom);
+    }
+    int width = (int)Math.round(panelSize.width * zoom);
+    int height = (int)Math.round(panelSize.height * zoom);
+    setSize(new Dimension(width, height));
+    setPreferredSize(new Dimension(width, height));
+    revalidate();
+    repaint();
+  }
+
+  public void zoomIn() {
+    setZoom(zoom + 0.1);
+  }
+
+  public void zoomOut() {
+    setZoom(zoom - 0.1);
+  }
+
+  public void resetZoom() {
+    setZoom(1.0);
+  }
+
   public void draw(Graphics g) {
     for (int i=0; i<gates.size(); i++) {
       Gate gate=gates.get(i);
@@ -148,6 +201,7 @@ public class LSPanel extends JPanel implements Printable {
     super.paintComponent(graphics);
     Graphics2D g = (Graphics2D) graphics.create();
     try {
+      g.scale(zoom, zoom);
       g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
       g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -180,11 +234,17 @@ public class LSPanel extends JPanel implements Printable {
         g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.drawLine(lastWirePoint.x, lastWirePoint.y, mousePos.x, mousePos.y);
       }
+      g.setTransform(((Graphics2D) graphics).getTransform());
     } finally {
       g.dispose();
     }
   }
 
+
+  private Point toCanvasPoint(MouseEvent e) {
+    Point p = e.getPoint();
+    return new Point((int)Math.round(p.x / zoom), (int)Math.round(p.y / zoom));
+  }
 
   protected void processMouseMotionEvent(MouseEvent e) {
     int id = e.getID();
@@ -192,8 +252,9 @@ public class LSPanel extends JPanel implements Printable {
 
     Graphics g = this.getGraphics();
     if (id == MouseEvent.MOUSE_DRAGGED || id == MouseEvent.MOUSE_MOVED) {
-      int x=e.getPoint().x;
-      int y=e.getPoint().y;
+      Point canvasPoint = toCanvasPoint(e);
+      int x=canvasPoint.x;
+      int y=canvasPoint.y;
       x=x/10*10;
       y=y/10*10;
 
@@ -254,8 +315,9 @@ public class LSPanel extends JPanel implements Printable {
   protected void processMouseEvent(MouseEvent e) {
     super.processMouseEvent(e);
     int id = e.getID();
-    int x=e.getPoint().x;
-    int y=e.getPoint().y;
+    Point canvasPoint = toCanvasPoint(e);
+    int x=canvasPoint.x;
+    int y=canvasPoint.y;
     int mod=e.getModifiers();
 
     //this.requestFocus();

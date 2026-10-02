@@ -88,7 +88,7 @@ public class Wire implements Serializable, Cloneable{
     for (int i=0; i<poly.npoints-1; i++) {
       Line2D l=new Line2D.Float((float)poly.xpoints[i], (float)poly.ypoints[i],
                                 (float)poly.xpoints[i+1], (float)poly.ypoints[i+1]);
-      if (l.ptSegDist((double)x, (double)y)<3.0f) return i;
+      if (l.ptSegDist((double)x, (double)y)<5.0f) return i;
     }
     return -1;
   }
@@ -140,7 +140,7 @@ public class Wire implements Serializable, Cloneable{
   // pr�ft, ob �bergebener Punkt in der N�he von einem Polygonpunkt ist (ausser erster und letzter)
   public int hasPointAt(int mx, int my) {
     for (int i=1; i<poly.npoints-1; i++) {
-      if (mx>poly.xpoints[i]-3 && mx<poly.xpoints[i]+3 && my>poly.ypoints[i]-3 && my<poly.ypoints[i]+3)
+      if (mx>poly.xpoints[i]-5 && mx<poly.xpoints[i]+5 && my>poly.ypoints[i]-5 && my<poly.ypoints[i]+5)
         return i;
     }
     return -1;
@@ -167,7 +167,7 @@ public class Wire implements Serializable, Cloneable{
     for (int i=0; i<poly.npoints-1; i++) {
       Line2D l=new Line2D.Float((float)poly.xpoints[i], (float)poly.ypoints[i],
                                 (float)poly.xpoints[i+1], (float)poly.ypoints[i+1]);
-      if (l.ptSegDist((double)mx, (double)my)<3.0f) {
+      if (l.ptSegDist((double)mx, (double)my)<5.0f) {
         insertPointAfter(i, mx, my);
         return i+1;
       }

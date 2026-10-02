@@ -176,11 +176,13 @@ public abstract class Gate implements Serializable {
       g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
       g.setColor(ModernUI.TEXT);
       g.drawImage(gateimage, x+3, y, null);
+      drawConnectorStubs(g);
       g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
       for (int i=0; i<getNumInput(); i++) {
         int cy=getInputPosition(i);
+        drawConnectorPort(g, x, y+cy, true, inputTypes[i]==INTYPE_NEGATIVE);
         if (inputTypes[i]==INTYPE_NEGATIVE)
-          g.drawOval(x-2,y+cy-3, 6, 6);
+          g.drawLine(x-2, y+cy, x+3, y+cy);
         else if (inputTypes[i]==INTYPE_HIGH) {
           g.setFont(ModernUI.SMALL.deriveFont(java.awt.Font.BOLD, 13f));
           g.drawString("1", x-5, y+cy+5);
@@ -195,10 +197,11 @@ public abstract class Gate implements Serializable {
       for (int i=0; i<getNumOutput(); i++) {
         int cy=getOutputPosition(i);
         int w=gateimage.getWidth(null);
+        drawConnectorPort(g, x+w+6, y+cy, false, !isOutputPositive(i));
         if (isOutputPositive(i))
           g.drawLine(x+w+3, y+cy, x+w+6, y+cy);
         else
-          g.drawOval(x+w+2, y+cy-3, 6, 6);
+          g.drawLine(x+w+2, y+cy, x+w+3, y+cy);
       }
 
       if (active) {
@@ -218,9 +221,45 @@ public abstract class Gate implements Serializable {
     }
   }
 
+  private void drawConnectorStubs(Graphics2D g) {
+    int imageWidth = gateimage == null ? 0 : gateimage.getWidth(null);
+    g.setStroke(new BasicStroke(2.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    g.setColor(ModernUI.CONNECTOR);
+    for (int i = 0; i < getNumInput(); i++) {
+      int cy = getInputPosition(i);
+      if (inputTypes[i] != INTYPE_NEGATIVE && inputTypes[i] != INTYPE_HIGH
+              && inputTypes[i] != INTYPE_LOW) {
+        g.drawLine(x - 5, y + cy, x + 3, y + cy);
+      }
+    }
+    for (int i = 0; i < getNumOutput(); i++) {
+      g.drawLine(x + imageWidth + 3, y + getOutputPosition(i),
+              x + imageWidth + 11, y + getOutputPosition(i));
+    }
+  }
+
+  private void drawConnectorPort(Graphics2D g, int px, int py, boolean input,
+                                  boolean inverted) {
+    if (input && inverted) {
+      g.setColor(ModernUI.SURFACE);
+      g.fillOval(px - 8, py - 8, 16, 16);
+      g.setColor(ModernUI.CONNECTOR);
+      g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+      g.drawOval(px - 7, py - 7, 14, 14);
+      return;
+    }
+    g.setColor(ModernUI.CONNECTOR_FILL);
+    g.fillOval(px - 6, py - 6, 12, 12);
+    g.setColor(ModernUI.CONNECTOR);
+    g.setStroke(new BasicStroke(2.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    g.drawOval(px - 5, py - 5, 10, 10);
+    g.setColor(ModernUI.CONNECTOR);
+    g.fillOval(px - 2, py - 2, 4, 4);
+  }
+
   public final Wire tryConnectOutput(int mx, int my) {
     for (int i=0; i<getNumOutput(); i++) {
-      if (mx>x+gateimagewidth+6-5 && mx<x+gateimagewidth+6+5 && my>y+getOutputPosition(i)-4 && my<y+getOutputPosition(i)+4) {
+      if (mx>x+gateimagewidth+6-9 && mx<x+gateimagewidth+6+9 && my>y+getOutputPosition(i)-8 && my<y+getOutputPosition(i)+8) {
         Wire w = new Wire(this, i);
         w.addPoint(x+gateimagewidth+6, y+getOutputPosition(i));
         return w;
@@ -232,7 +271,7 @@ public abstract class Gate implements Serializable {
   public final boolean tryConnectInput(int mx, int my, Wire w) {
     if (w==null) return false;
     for (int i=0; i<getNumInput(); i++) {
-      if (mx>x-5 && mx<x+5 && my>y+getInputPosition(i)-4 && my<y+getInputPosition(i)+4) {
+      if (mx>x-9 && mx<x+9 && my>y+getInputPosition(i)-8 && my<y+getInputPosition(i)+8) {
         this.setInput(i,w);
         w.addPoint(x, y+getInputPosition(i));
         return true;
@@ -243,7 +282,7 @@ public abstract class Gate implements Serializable {
 
   public final boolean trySetInputType(int mx, int my, int type) {
     for (int i=0; i<getNumInput(); i++) {
-      if (mx>x-5 && mx<x+5 && my>y+getInputPosition(i)-4 && my<y+getInputPosition(i)+4) {
+      if (mx>x-9 && mx<x+9 && my>y+getInputPosition(i)-8 && my<y+getInputPosition(i)+8) {
         if (type==INTYPE_HIGH || type==INTYPE_LOW) setInput(i,null);
         inputTypes[i]=type;
         return true;

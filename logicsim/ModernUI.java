@@ -21,6 +21,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
 /**
@@ -47,12 +48,15 @@ final class ModernUI {
     static final Color GRID_MAJOR = new Color(0xD9E0EB);
     static final Color WIRE_LOW = new Color(0x526174);
     static final Color WIRE_HIGH = new Color(0xF04465);
+    static final Color CONNECTOR = new Color(0x5B5CE2);
+    static final Color CONNECTOR_FILL = new Color(0xEEF0FF);
     static final Color SELECTION = new Color(0x696AF0);
 
     private static final Font SANS = chooseFont("Inter", "Segoe UI", "SF Pro Display", "Dialog");
     static final Font NORMAL = SANS.deriveFont(Font.PLAIN, 14f);
     static final Font MEDIUM = SANS.deriveFont(Font.BOLD, 14f);
     static final Font SMALL = SANS.deriveFont(Font.PLAIN, 12f);
+    static final Font TITLE = SANS.deriveFont(Font.BOLD, 20f);
 
     private ModernUI() {
     }
@@ -187,6 +191,23 @@ final class ModernUI {
         panel.add(ModernIcons.wrap(mark, PRIMARY), java.awt.BorderLayout.EAST);
         panel.add(labels, java.awt.BorderLayout.CENTER);
         return panel;
+    }
+
+    static void styleToolbarDivider(JToolBar toolbar) {
+        toolbar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 1, 0, 0, BORDER),
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)));
+    }
+
+    static void styleZoomButton(AbstractButton button) {
+        button.setFocusPainted(false);
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setMargin(new Insets(8, 9, 8, 9));
+        button.setPreferredSize(new Dimension(42, 42));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button.setUI(new ModernButtonUI(false));
     }
 
     static JLabel sectionTitle(String text) {
